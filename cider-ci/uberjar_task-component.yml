@@ -1,19 +1,22 @@
+traits:
+  JDK: true
+  Leiningen 2: true
+
 scripts:
-  build-uberjar:
+  build-my-uberjar:
     timeout: 10 minutes
     exclusive_executor_resource: build-leihs-my-jar
     body: |
       #!/usr/bin/env bash
-      set -eux
-
-      sh scripts/prepare-shared-ui.sh
-      
-      export LEIN_SNAPSHOTS_IN_RELEASE=yes
+      set -euxo
+      cd $LEIHS_MY_DIR
       DIGEST=$(git log -n 1 HEAD --pretty=%T)
       LEIN_UBERJAR_FILE="/tmp/leihs-my_${DIGEST}.jar"
       if [ -f "${LEIN_UBERJAR_FILE}" ];then
         echo " ${LEIN_UBERJAR_FILE} exists"
       else
+        sh scripts/prepare-shared-ui.sh
+        export LEIN_SNAPSHOTS_IN_RELEASE=yes
         lein uberjar
         mv "target/leihs-my.jar" "${LEIN_UBERJAR_FILE}"
       fi

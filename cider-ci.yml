@@ -12,12 +12,9 @@ jobs:
         include:
           - cider-ci/database_task-component.yml
           - cider-ci/ruby-bundle_task-component.yml
-          - cider-ci/server_task-component.yml
+          - cider-ci/service_task-component.yml
           - cider-ci/test-auth-system_task-component.yml
           - cider-ci/uberjar_task-component.yml
-        traits:
-          JDK 8: true
-          Leiningen 2: true
         ports:
           LEIHS_MY_HTTP_PORT:
             min: 3240
@@ -26,7 +23,7 @@ jobs:
             min: 3240
             max: 3249
         environment_variables:
-          MY_DIR: '{{CIDER_CI_WORKING_DIR}}'
+          LEIHS_MY_DIR: '{{CIDER_CI_WORKING_DIR}}'
           DATABASE_NAME: leihs_api_{{CIDER_CI_TRIAL_ID}}
           LEIHS_DATABASE_URL: "jdbc:postgresql://localhost/{{DATABASE_NAME}}?max-pool-size=5"
           LEIHS_MY_HTTP_BASE_URL: http://localhost:{{LEIHS_MY_HTTP_PORT}}

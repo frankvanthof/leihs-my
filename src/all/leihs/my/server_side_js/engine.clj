@@ -9,31 +9,23 @@
 
 (def render-wait-time-max-ms 5000)
 
-(def tmp-file "/tmp/leihs-ui-server-side.js")
+(defn ssr-cli-input-stream []
+  (-> "public/my/leihs-ssr.js"
+  io/resource io/input-stream))
 
-(defn server-side-js-input-stream []
-  (-> "public/my/leihs-ui-server-side.js"
-      io/resource io/input-stream))
-
-(with-open [in (server-side-js-input-stream)]
+; TMP FOR POC. But we might want to do it thusly in dev mode, so it can be watched?
+(programs cat)
+(def tmp-file "/tmp/leihs-ssr.js")
+(with-open [in (ssr-cli-input-stream)]
   (io/copy in (io/file tmp-file)))
-
-;(slurp (server-side-js-input-stream))
-
-(defn js-code
-  [name props]
-  (str
-    "window = global = this
-   l = require('" tmp-file "')
-   l.renderComponentToString('"
-    name
-    "', "
-    (to-json props)
-    ")"))
+; this should just be the input stream, but just piping it did not work.
+(defn ssr-cli [] (cat tmp-file))
 
 (defn render-react
   [name props]
   (try
-    (node "-p" (js-code name props) {:timeout render-wait-time-max-ms})
+    (node
+      "-" "render" name (to-json props)
+      {:in (ssr-cli) :timeout render-wait-time-max-ms})
     (catch Exception e
       (throw (ex-info "Render Error!" {:status 500, :causes {:err e}})))))

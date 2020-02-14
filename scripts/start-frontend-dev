@@ -1,0 +1,4 @@
+#!/bin/sh -exu
+
+./scripts/prepare-shared-ui.sh
+lein figwheel
